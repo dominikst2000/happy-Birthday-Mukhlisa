@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>С Днём Рождения, Мухлиса!</title>
+    <style>
+        :root {
+            --neon-pink: #ff006e;
+            --neon-purple: #8338ec;
+            --neon-blue: #3a86ff;
+            --neon-cyan: #00f5d4;
+            --neon-yellow: #fee440;
+            --dark-bg: #0a0a0f;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: var(--dark-bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* ==================== ВСТУПИТЕЛЬНЫЙ ЭКРАН ==================== */
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            z-index: 6000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 1s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .intro-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.5);
+        }
+
+        .intro-text {
+            font-size: 3em;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            animation: introFade 1s ease;
+            text-shadow: 0 0 40px rgba(255, 0, 110, 0.8);
+        }
+
+        .intro-text .highlight {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.3em;
+            display: block;
+            margin-top: 10px;
+        }
+
+        @keyframes introFade {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== ЭКРАН ЗАГРУЗКИ ==================== */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.2);
+        }
+
+        .loader-ring {
+            width: 120px;
+            height: 120px;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--neon-pink);
+            border-right: 3px solid var(--neon-purple);
+            border-bottom: 3px solid var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ==================== КУРСОР ==================== */
+        .cursor {
+            width: 25px;
+            height: 25px;
+            border: 2px solid var(--neon-pink);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.15s ease;
+            box-shadow: 0 0 20px var(--neon-pink);
+            mix-blend-mode: screen;
+        }
+
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* ==================== ФОН ==================== */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(255, 0, 110, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(131, 56, 236, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(58, 134, 255, 0.1) 0%, transparent 50%);
+            animation: auroraShift 8s ease-in-out infinite;
+        }
+
+        @keyframes auroraShift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            33% { transform: translateX(-50px) translateY(30px); }
+            66% { transform: translateX(50px) translateY(-20px); }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: particleFloat linear infinite;
+            filter: blur(2px);
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 95%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 15px;
+        }
+
+        /* ==================== МУЗЫКА ==================== */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 2px solid var(--neon-pink);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.4);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--neon-pink);
+        }
+
+        .music-btn.playing svg {
+            fill: var(--neon-cyan);
+            animation: spin 4s linear infinite;
+        }
+
+        /* ==================== ВИЗУАЛИЗАТОР ==================== */
+        .visualizer {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .visualizer.active {
+            opacity: 1;
+        }
+
+        .visualizer-bar {
+            width: 6px;
+            height: 30px;
+            background: linear-gradient(to top, var(--neon-pink), var(--neon-purple), var(--neon-cyan));
+            border-radius: 3px;
+            animation: visualizerDance 0.5s ease-in-out infinite alternate;
+        }
+
+        .visualizer-bar:nth-child(odd) {
+            animation-delay: 0.2s;
+            background: linear-gradient(to top, var(--neon-blue), var(--neon-cyan), var(--neon-yellow));
+        }
+
+        @keyframes visualizerDance {
+            0% { height: 10px; }
+            100% { height: 60px; }
+        }
+
+        /* ==================== HERO ==================== */
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero-title {
+            font-size: 4.5em;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero-title .line1 {
+            display: block;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(255, 0, 110, 0.6));
+        }
+
+        .hero-title .line2 {
+            display: block;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(58, 134, 255, 0.6));
+        }
+
+        .hero-name {
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--neon-yellow), var(--neon-pink), var(--neon-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+            margin-top: 15px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* ==================== ЦИТАТА ==================== */
+        .quote-section {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 30px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '"';
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 6em;
+            color: var(--neon-pink);
+            opacity: 0.3;
+            font-family: serif;
+        }
+
+        .quote-text {
+            font-size: 1.5em;
+            color: #e0e0e0;
+            line-height: 1.8;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-text .highlight {
+            color: var(--neon-pink);
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+        }
+
+        /* ==================== 3D КАРУСЕЛЬ ==================== */
+        .carousel-section {
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 430px;
+            perspective: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .carousel-item {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 260px;
+            height: 340px;
+            margin-left: -130px;
+            margin-top: -170px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.5s ease;
+            background: var(--glass);
+        }
+
+        .carousel-item:hover {
+            border-color: var(--neon-pink);
+            box-shadow: 0 20px 60px rgba(255, 0, 110, 0.5);
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 2px solid var(--neon-purple);
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(131, 56, 236, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .carousel-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--neon-purple);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        /* ==================== СЕКЦИИ ==================== */
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-purple), transparent);
+        }
+
+        .section-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(131, 56, 236, 0.7);
+            text-align: center;
+            white-space: normal;
+        }
+
+        /* ==================== ПОЖЕЛАНИЯ ==================== */
+        .wishes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 50px;
+        }
+
+        .wish-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wish-card:hover {
+            border-color: var(--neon-pink);
+            box-shadow: 0 15px 40px rgba(255, 0, 110, 0.25);
+            transform: translateY(-8px);
+        }
+
+        .wish-icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.2), rgba(131, 56, 236, 0.2));
+            border: 1px solid rgba(255, 0, 110, 0.3);
+        }
+
+        .wish-icon-wrapper svg {
+            width: 25px;
+            height: 25px;
+            fill: var(--neon-pink);
+        }
+
+        .wish-text {
+            color: #e0e0e0;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .wish-text span {
+            color: var(--neon-pink);
+            font-weight: 700;
+        }
+
+        /* ==================== ФИНАЛ ==================== */
+        .final-section {
+            text-align: center;
+            padding: 50px 25px;
+            background: var(--glass);
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-title {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .final-text {
+            font-size: 1.3em;
+            color: #e0e0e0;
+            margin: 25px 0;
+            line-height: 1.7;
+        }
+
+        .btn-neon {
+            padding: 18px 45px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 40px rgba(255, 0, 110, 0.5);
+        }
+
+        .btn-neon:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(255, 0, 110, 0.8);
+        }
+
+        /* ==================== ГИФКИ ==================== */
+        .gif-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .gif-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--glass-border);
+            animation: gifFloat 3s ease-in-out infinite;
+        }
+
+        .gif-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes gifFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* ==================== АДАПТИВ ==================== */
+        @media (max-width: 768px) {
+            .intro-text {
+                font-size: 2em;
+            }
+            .hero-title {
+                font-size: 2.8em;
+            }
+            .hero-name {
+                font-size: 1.5em;
+            }
+            .carousel-container {
+                height: 340px;
+            }
+            .carousel-item {
+                width: 190px;
+                height: 250px;
+                margin-left: -95px;
+                margin-top: -125px;
+            }
+            .wishes-grid {
+                grid-template-columns: 1fr;
+            }
+            .quote-text {
+                font-size: 1.2em;
+            }
+            .music-btn {
+                width: 45px;
+                height: 45px;
+                top: 10px;
+                right: 10px;
+            }
+            .gif-box {
+                width: 70px;
+                height: 70px;
+            }
+            .final-title {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ВСТУПИТЕЛЬНЫЙ ЭКРАН -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-text">
+            Привет, <span class="highlight">Мухлиса!</span>
+            <br><br>
+            <span style="font-size: 0.6em; color: #aaa;">У меня кое-что есть для тебя...</span>
+        </div>
+    </div>
+
+    <!-- ЭКРАН ЗАГРУЗКИ -->
+    <div class="loader" id="loader">
+        <div class="loader-ring"></div>
+    </div>
+
+    <!-- КУРСОР -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <!-- ФОН -->
+    <div class="aurora-bg"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- ВИЗУАЛИЗАТОР -->
+    <div class="visualizer" id="visualizer">
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+        <div class="visualizer-bar"></div>
+    </div>
+
+    <!-- МУЗЫКА -->
+    <button class="music-btn" id="musicBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    </button>
+
+    <div class="container">
+        <!-- ГИФКИ -->
+        <div class="gif-container">
+            <div class="gif-box"><img src="gif1.gif" onerror="this.style.display='none'"></div>
+            <div class="gif-box"><img src="gif2.gif" onerror="this.style.display='none'"></div>
+            <div class="gif-box"><img src="gif3.gif" onerror="this.style.display='none'"></div>
+        </div>
+
+        <!-- HERO -->
+        <div class="hero">
+            <h1 class="hero-title">
+                <span class="line1">С Днём</span>
+                <span class="line2">Рождения!</span>
+            </h1>
+            <div class="hero-name">Мухлиса</div>
+        </div>
+
+        <!-- ЦИТАТА -->
+        <div class="quote-section">
+            <p class="quote-text">
+                Ты заслуживаешь <span class="highlight">всего самого лучшего</span>,<br>
+                что только может быть в этом мире.<br>
+                Пусть каждый твой день будет наполнен<br>
+                <span class="highlight">светом, радостью и теплом</span>.
+            </p>
+        </div>
+
+        <!-- 3D КАРУСЕЛЬ -->
+        <div class="section-label">
+            <div class="section-line"></div>
+            <div class="section-text">Ты прекрасна всегда — смотри сама, насколько ты красива</div>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="carousel-section">
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack"></div>
+                <button class="carousel-btn prev" id="carouselPrev">
+                    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                </button>
+                <button class="carousel-btn next" id="carouselNext">
+                    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- ПОЖЕЛАНИЯ -->
+        <div class="section-label">
+            <div class="section-line"></div>
+            <div class="section-text">Пожелания</div>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="wishes-grid">
+            <div class="wish-card">
+                <div class="wish-icon-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2-6.3-4.5-6.3 4.5L8 13.8 2 9.4h7.6z"/></svg>
+                </div>
+                <div class="wish-text">Будь всегда такой же <span>яркой и жизнерадостной</span></div>
+            </div>
+            <div class="wish-card">
+                <div class="wish-icon-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div class="wish-text">Пусть каждый день приносит <span>только радость</span></div>
+            </div>
+            <div class="wish-card">
+                <div class="wish-icon-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+                </div>
+                <div class="wish-text">Пусть всё задуманное <span>исполняется легко</span></div>
+            </div>
+            <div class="wish-card">
+                <div class="wish-icon-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4z"/></svg>
+                </div>
+                <div class="wish-text">Оставайся <span>такой же удивительной</span></div>
+            </div>
+        </div>
+
+        <!-- ФИНАЛ -->
+        <div class="final-section">
+            <div class="final-title">С днём рождения!</div>
+            <div class="final-text">
+                Пусть этот день будет таким же прекрасным,<br>
+                как и ты!
+            </div>
+            <button class="btn-neon" id="surpriseBtn">СЮРПРИЗ</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== КОНФИГУРАЦИЯ ====================
+        const PHOTO_COUNT = 15;
+        const MUSIC_FILE = 'song.mp3';
+
+        // ==================== ПОСЛЕДОВАТЕЛЬНОСТЬ ЭКРАНОВ ====================
+        window.addEventListener('load', () => {
+            // Показываем интро 3 секунды
+            setTimeout(() => {
+                document.getElementById('introScreen').classList.add('hidden');
+                
+                // Показываем загрузку 1.5 секунды
+                setTimeout(() => {
+                    document.getElementById('loader').classList.add('hidden');
+                }, 1500);
+            }, 3000);
+        });
+
+        // ==================== КУРСОР ====================
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursorDot');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 12.5 + 'px';
+            cursor.style.top = e.clientY - 12.5 + 'px';
+            cursorDot.style.left = e.clientX - 3 + 'px';
+            cursorDot.style.top = e.clientY - 3 + 'px';
+        });
+
+        // ==================== ЧАСТИЦЫ ====================
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const colors = ['#ff006e', '#8338ec', '#3a86ff', '#00f5d4', '#fee440'];
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 6 + 2;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.boxShadow = `0 0 ${size * 2}px ${colors[Math.floor(Math.random() * colors.length)]}`;
+                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                p.style.animationDelay = Math.random() * 8 + 's';
+                container.appendChild(p);
+            }
+        }
+
+        // ==================== 3D КАРУСЕЛЬ ====================
+        const carouselTrack = document.getElementById('carouselTrack');
+        let currentAngle = 0;
+        const carouselItems =8;
+
+        function createCarousel() {
+            const angleStep = 360 / carouselItems;
+            for (let i = 0; i < carouselItems; i++) {
+                const item = document.createElement('div');
+                item.classList.add('carousel-item');
+                const angle = angleStep * i;
+                item.style.transform = `rotateY(${angle}deg) translateZ(350px)`;
+                item.innerHTML = `
+                    <img src="photo${i + 1}.jpg" alt="Фото ${i + 1}"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#ff006e;background:rgba(255,255,255,0.05);font-size:30px;\'>★</div>'">
+                `;
+                carouselTrack.appendChild(item);
+            }
+        }
+
+        document.getElementById('carouselPrev').addEventListener('click', () => {
+            currentAngle += 36;
+            carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+        });
+
+        document.getElementById('carouselNext').addEventListener('click', () => {
+            currentAngle -= 36;
+            carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+        });
+
+        // ==================== МУЗЫКА + ВИЗУАЛИЗАТОР ====================
+        const musicBtn = document.getElementById('musicBtn');
+        const visualizer = document.getElementById('visualizer');
+        let audio = null;
+        let isPlaying = false;
+
+        musicBtn.addEventListener('click', () => {
+            if (!audio) {
+                audio = new Audio(MUSIC_FILE);
+                audio.loop = true;
+            }
+            if (isPlaying) {
+                audio.pause();
+                musicBtn.classList.remove('playing');
+                visualizer.classList.remove('active');
+                isPlaying = false;
+            } else {
+                audio.play().catch(() => alert('Добавь файл ' + MUSIC_FILE));
+                musicBtn.classList.add('playing');
+                visualizer.classList.add('active');
+                isPlaying = true;
+            }
+        });
+
+        // ==================== СЮРПРИЗ ====================
+        function createSurprise() {
+            const symbols = ['★', '✦', '✧', '◆', '●', '▲', '■'];
+            const colors = ['#ff006e', '#8338ec', '#3a86ff', '#00f5d4', '#fee440'];
+            
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.style.position = 'fixed';
+                    el.style.top = '-30px';
+                    el.style.left = Math.random() * 100 + '%';
+                    el.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                    el.style.pointerEvents = 'none';
+                    el.style.zIndex = '3000';
+                    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    el.style.textShadow = `0 0 20px ${colors[Math.floor(Math.random() * colors.length)]}`;
+                    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    el.style.animation = `floatDown ${Math.random() * 3 + 4}s linear forwards`;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 7000);
+                }, i * 25);
+            }
+        }
+
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes floatDown {
+                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        document.getElementById('surpriseBtn').addEventListener('click', function() {
+            createSurprise();
+            this.textContent = 'С ДНЁМ РОЖДЕНИЯ!';
+            setTimeout(() => { this.textContent = 'СЮРПРИЗ'; }, 3000);
+        });
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        createParticles();
+        createCarousel();
+    </script>
+</body>
+</html>
