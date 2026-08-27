@@ -360,6 +360,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: grab;
+        }
+
+        .carousel-container:active {
+            cursor: grabbing;
         }
 
         .carousel-track {
@@ -382,7 +387,6 @@
             overflow: hidden;
             border: 2px solid var(--glass-border);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
             transition: all 0.5s ease;
             background: var(--glass);
         }
@@ -396,38 +400,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        .carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--glass);
-            border: 2px solid var(--neon-purple);
-            cursor: pointer;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 20px rgba(131, 56, 236, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .carousel-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--neon-purple);
-        }
-
-        .carousel-btn.prev {
-            left: 10px;
-        }
-
-        .carousel-btn.next {
-            right: 10px;
+            pointer-events: none;
         }
 
         /* ==================== СЕКЦИИ ==================== */
@@ -700,14 +673,8 @@
         </div>
 
         <div class="carousel-section">
-            <div class="carousel-container">
+            <div class="carousel-container" id="carouselContainer">
                 <div class="carousel-track" id="carouselTrack"></div>
-                <button class="carousel-btn prev" id="carouselPrev">
-                    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-                </button>
-                <button class="carousel-btn next" id="carouselNext">
-                    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
-                </button>
             </div>
         </div>
 
@@ -758,16 +725,13 @@
 
     <script>
         // ==================== КОНФИГУРАЦИЯ ====================
-        const PHOTO_COUNT = 15;
+        const PHOTO_COUNT = 8;
         const MUSIC_FILE = 'song.mp3';
 
         // ==================== ПОСЛЕДОВАТЕЛЬНОСТЬ ЭКРАНОВ ====================
         window.addEventListener('load', () => {
-            // Показываем интро 3 секунды
             setTimeout(() => {
                 document.getElementById('introScreen').classList.add('hidden');
-                
-                // Показываем загрузку 1.5 секунды
                 setTimeout(() => {
                     document.getElementById('loader').classList.add('hidden');
                 }, 1500);
@@ -806,8 +770,14 @@
 
         // ==================== 3D КАРУСЕЛЬ ====================
         const carouselTrack = document.getElementById('carouselTrack');
+        const carouselContainer = document.getElementById('carouselContainer');
         let currentAngle = 0;
-        const carouselItems =8;
+        let isDragging = false;
+        let startX = 0;
+        let lastX = 0;
+        let velocity = 0;
+        let autoRotateInterval;
+        const carouselItems = PHOTO_COUNT;
 
         function createCarousel() {
             const angleStep = 360 / carouselItems;
@@ -824,39 +794,149 @@
             }
         }
 
-        document.getElementById('carouselPrev').addEventListener('click', () => {
-            currentAngle += 36;
-            carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+        // ==================== УПРАВЛЕНИЕ МЫШЬЮ ====================
+        carouselContainer.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            lastX = e.clientX;
+            velocity = 0;
+            carouselTrack.style.transition = 'none';
+            stopAutoRotate();
         });
 
-        document.getElementById('carouselNext').addEventListener('click', () => {
-            currentAngle -= 36;
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - lastX;
+            velocity = e.clientX - startX;
+            currentAngle += dx * 0.3;
             carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+            lastX = e.clientX;
         });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            carouselTrack.style.transition = 'transform 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+            
+            if (Math.abs(velocity) > 50) {
+                currentAngle += velocity * 2;
+                carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+            }
+            
+            startAutoRotate();
+        });
+
+        // ==================== УПРАВЛЕНИЕ ПАЛЬЦЕМ ====================
+        let touchStartX = 0;
+        let touchLastX = 0;
+        let touchVelocity = 0;
+
+        carouselContainer.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            touchStartX = e.changedTouches[0].screenX;
+            touchLastX = e.changedTouches[0].screenX;
+            touchVelocity = 0;
+            carouselTrack.style.transition = 'none';
+            stopAutoRotate();
+        });
+
+        carouselContainer.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const dx = e.changedTouches[0].screenX - touchLastX;
+            touchVelocity = e.changedTouches[0].screenX - touchStartX;
+            currentAngle += dx * 0.3;
+            carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+            touchLastX = e.changedTouches[0].screenX;
+        }, { passive: false });
+
+        carouselContainer.addEventListener('touchend', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            carouselTrack.style.transition = 'transform 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+            
+            if (Math.abs(touchVelocity) > 50) {
+                currentAngle += touchVelocity * 2;
+                carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+            }
+            
+            startAutoRotate();
+        });
+
+        // ==================== АВТОПОВОРОТ ====================
+        function startAutoRotate() {
+            stopAutoRotate();
+            autoRotateInterval = setInterval(() => {
+                if (!isDragging) {
+                    currentAngle += 0.5;
+                    carouselTrack.style.transition = 'transform 0.5s ease';
+                    carouselTrack.style.transform = `rotateY(${currentAngle}deg)`;
+                }
+            }, 30);
+        }
+
+        function stopAutoRotate() {
+            if (autoRotateInterval) {
+                clearInterval(autoRotateInterval);
+                autoRotateInterval = null;
+            }
+        }
 
         // ==================== МУЗЫКА + ВИЗУАЛИЗАТОР ====================
         const musicBtn = document.getElementById('musicBtn');
         const visualizer = document.getElementById('visualizer');
         let audio = null;
         let isPlaying = false;
+        let musicStarted = false;
 
-        musicBtn.addEventListener('click', () => {
+        function startMusic() {
+            if (musicStarted) return;
+            
             if (!audio) {
                 audio = new Audio(MUSIC_FILE);
                 audio.loop = true;
             }
+            
+            audio.play()
+                .then(() => {
+                    isPlaying = true;
+                    musicStarted = true;
+                    musicBtn.classList.add('playing');
+                    visualizer.classList.add('active');
+                })
+                .catch(() => {});
+        }
+
+        function toggleMusic() {
+            if (!audio) {
+                audio = new Audio(MUSIC_FILE);
+                audio.loop = true;
+            }
+            
             if (isPlaying) {
                 audio.pause();
                 musicBtn.classList.remove('playing');
                 visualizer.classList.remove('active');
                 isPlaying = false;
             } else {
-                audio.play().catch(() => alert('Добавь файл ' + MUSIC_FILE));
-                musicBtn.classList.add('playing');
-                visualizer.classList.add('active');
-                isPlaying = true;
+                audio.play()
+                    .then(() => {
+                        musicBtn.classList.add('playing');
+                        visualizer.classList.add('active');
+                        isPlaying = true;
+                        musicStarted = true;
+                    })
+                    .catch(() => alert('Добавь файл ' + MUSIC_FILE));
             }
+        }
+
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMusic();
         });
+
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
 
         // ==================== СЮРПРИЗ ====================
         function createSurprise() {
@@ -900,6 +980,7 @@
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         createParticles();
         createCarousel();
+        startAutoRotate();
     </script>
 </body>
 </html>
